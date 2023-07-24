@@ -1,9 +1,12 @@
 import { Formik } from 'formik';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import { FormField, Form, ErrorMessage, Field } from './ContactForm.styled';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
-import { AddButton } from '../Button/Button';
+import { addContact } from 'redux/сontacts/contactsOperation';
+import { selectContacts } from 'redux/сontacts/contactsSelectors';
+import { ButtonA } from 'components/Button/Button.styled';
 
 const phoneRegExp =
   /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
@@ -19,9 +22,13 @@ const ContactSchema = Yup.object().shape({
     .required('Required field!'),
 });
 
-export const ContactForm = ({ addNewContact }) => {
+export const ContactForm = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+
+  const dispatch = useDispatch();
+
+  const contacts = useSelector(selectContacts);
 
   const handleContactInput = e => {
     const { name, value } = e.target;
@@ -37,15 +44,24 @@ export const ContactForm = ({ addNewContact }) => {
     }
   };
 
-  const onFormReset = () => {
-    setName('');
-    setPhone('');
-  };
-
   const handleOnSubmit = e => {
     e.preventDefault();
-    addNewContact({ name, phone });
-    onFormReset();
+    const form = e.target;
+
+    const isInContacts = contacts.some(
+      ({ name }) =>
+        name.toLowerCase() === form.elements.name.value.toLowerCase()
+    );
+
+    if (isInContacts) {
+      Notify.failure(`${form.elements.name.value} is already in contacts!`);
+      return;
+    }
+
+    dispatch(addContact({ name, phone }));
+
+    setName('');
+    setPhone('');
   };
 
   return (
@@ -77,12 +93,8 @@ export const ContactForm = ({ addNewContact }) => {
           />
           <ErrorMessage name="phone" component="div" />
         </FormField>
-        <AddButton type="submit" />
+        <ButtonA type="submit">Save contact</ButtonA>
       </Form>
     </Formik>
   );
-};
-
-ContactForm.propTypes = {
-  addNewContact: PropTypes.func.isRequired,
 };

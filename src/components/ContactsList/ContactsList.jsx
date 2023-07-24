@@ -1,34 +1,33 @@
-import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
-import { selectContacts } from 'redux/сontacts/contactsSelectors';
-import { selectFilter } from 'redux/filter/filterSelectors';
-import { Contact } from '../ContactItem/ContactItem';
-import { DeleteButton } from '../Button/Button';
+import { useSelector, useDispatch } from 'react-redux';
 import { ContactListSt } from './ContactsList.styled';
 import { ContactSt } from 'components/ContactItem/ContactItem.styled';
+import { deleteContact } from 'redux/сontacts/contactsOperation';
+import { BsTrash } from 'react-icons/bs';
+import { ButtonD } from 'components/Button/Button.styled';
+import { selectFilteredContacts } from 'redux/сontacts/contactsSelectors';
 
-export const ContactList = ({ contactDelete }) => {
-  const contacts = useSelector(selectContacts);
-  const filter = useSelector(selectFilter);
+export const ContactList = () => {
+  const contacts = useSelector(selectFilteredContacts);
+  const dispatch = useDispatch();
+  const contactDelete = id => {
+    dispatch(deleteContact(id));
+  };
 
   return (
     <ContactListSt>
-      {contacts
-        .filter(contact => contact.name.toLowerCase().includes(filter))
-        .map(contact => (
-          <ContactSt key={contact.id}>
-            <Contact contact={contact} />
-            <DeleteButton
-              type="button"
-              contactDelete={contactDelete}
-              contactId={contact.id}
-            />
-          </ContactSt>
-        ))}
+      {contacts.map(contact => (
+        <ContactSt key={contact.id}>
+          <p>{contact.name}: </p>
+          <p>{contact.phone}</p>
+          <ButtonD
+            type="button"
+            name="delete"
+            onClick={() => contactDelete(contact.id)}
+          >
+            <BsTrash size={16} />
+          </ButtonD>
+        </ContactSt>
+      ))}
     </ContactListSt>
   );
-};
-
-ContactList.propTypes = {
-  contactDelete: PropTypes.func.isRequired,
 };
