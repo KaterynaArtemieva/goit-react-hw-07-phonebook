@@ -13,7 +13,7 @@ const ContactSchema = Yup.object().shape({
     .trim()
     .matches(nameRegExp, 'Name is not valid')
     .required('Required field!'),
-  number: Yup.string()
+  phone: Yup.string()
     .trim()
     .matches(phoneRegExp, 'Phone number is not valid')
     .required('Required field!'),
@@ -21,7 +21,7 @@ const ContactSchema = Yup.object().shape({
 
 export const ContactForm = ({ addNewContact }) => {
   const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  const [phone, setPhone] = useState('');
 
   const handleContactInput = e => {
     const { name, value } = e.target;
@@ -29,8 +29,8 @@ export const ContactForm = ({ addNewContact }) => {
       case 'name':
         setName(value);
         break;
-      case 'number':
-        setNumber(value);
+      case 'phone':
+        setPhone(value);
         break;
       default:
         break;
@@ -39,12 +39,12 @@ export const ContactForm = ({ addNewContact }) => {
 
   const onFormReset = () => {
     setName('');
-    setNumber('');
+    setPhone('');
   };
 
   const handleOnSubmit = e => {
     e.preventDefault();
-    addNewContact({ name, number });
+    addNewContact({ name, phone });
     onFormReset();
   };
 
@@ -52,7 +52,7 @@ export const ContactForm = ({ addNewContact }) => {
     <Formik
       initialValues={{
         name: '',
-        number: '',
+        phone: '',
       }}
       validationSchema={ContactSchema}
     >
@@ -68,14 +68,14 @@ export const ContactForm = ({ addNewContact }) => {
           <ErrorMessage name="name" component="div" />
         </FormField>
         <FormField>
-          Number
+          Phone
           <Field
-            name="number"
-            value={number}
+            name="phone"
+            value={phone}
             type="tel"
             onChange={handleContactInput}
           />
-          <ErrorMessage name="number" component="div" />
+          <ErrorMessage name="phone" component="div" />
         </FormField>
         <AddButton type="submit" />
       </Form>
